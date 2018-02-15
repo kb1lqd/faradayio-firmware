@@ -67,18 +67,6 @@ void main (void)
     // Enable global interrupt
     __bis_SR_register(GIE);
 
-    //Test
-    //USCI_A0 TX buffer ready?
-    unsigned char i;
-    for(i=0;i<256;i++){
-        while (!USCI_B_SPI_getInterruptStatus(USCI_B0_BASE,
-                   USCI_B_SPI_TRANSMIT_INTERRUPT)) ;
-
-        //Transmit Data to slave
-        transmitData = i;
-        USCI_B_SPI_transmitData(USCI_B0_BASE, transmitData);
-    }
-
     // Infinite main loop
     while(1){
 
