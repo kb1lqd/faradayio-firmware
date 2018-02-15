@@ -31,6 +31,10 @@ unsigned char init_gpio_spi(void){
 //        );
 
     // CS
+    //PA.x output
+    GPIO_setAsOutputPin(
+        GPIO_PORT_P5, GPIO_PIN5
+        );
     GPIO_setOutputHighOnPin(
         GPIO_PORT_P5,
         GPIO_PIN5

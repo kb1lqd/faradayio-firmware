@@ -43,7 +43,7 @@
 #include "initializations/init_ucs.h" // @TODO Make this a project global initialization directory for the linker.
 #include "initializations/init_spi.h" // @TODO Make this a project global initialization directory for the linker.
 #include "initializations/init_gpio.h" // @TODO Make this a project global initialization directory for the linker.
-
+#include "sram/sram.h"
 /**
  * This function is the main function of the program. It contains an infinite
  * loop that iterates indefinitely.
@@ -62,6 +62,12 @@ void main (void)
     //Initialize SPI
     init_gpio_spi();
     init_spi();
+
+    __no_operation();
+    sram_enable_chip_select();
+    __no_operation();
+    sram_disable_chip_select();
+    __no_operation();
 
 
     // Enable global interrupt
