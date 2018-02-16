@@ -32,6 +32,13 @@ unsigned char init_gpio_spi(void){
         GPIO_PIN1
         );
 
+    // Set SPI HOLD pin as outputs
+    GPIO_setAsOutputPin(
+        GPIO_PORT_P5,
+        GPIO_PIN6
+        );
+
+
     // Set chip select pins HIGH
     GPIO_setOutputHighOnPin(
         GPIO_PORT_P5,
@@ -44,6 +51,12 @@ unsigned char init_gpio_spi(void){
     GPIO_setOutputHighOnPin(
         GPIO_PORT_P1,
         GPIO_PIN1
+        );
+
+    // Set SPI HOLD pin HIGH
+    GPIO_setOutputHighOnPin(
+        GPIO_PORT_P5,
+        GPIO_PIN6
         );
 
 

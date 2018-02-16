@@ -25,8 +25,10 @@ unsigned char init_spi(void){
     param.clockSourceFrequency = UCS_getSMCLK();
     param.desiredSpiClock = SPICLK;
     param.msbFirst = USCI_B_SPI_MSB_FIRST;
-    param.clockPhase = USCI_B_SPI_PHASE_DATA_CHANGED_ONFIRST_CAPTURED_ON_NEXT;
-    param.clockPolarity = USCI_B_SPI_CLOCKPOLARITY_INACTIVITY_HIGH;
+    //param.clockPhase = USCI_B_SPI_PHASE_DATA_CHANGED_ONFIRST_CAPTURED_ON_NEXT;
+    param.clockPhase = USCI_B_SPI_PHASE_DATA_CAPTURED_ONFIRST_CHANGED_ON_NEXT;
+    //param.clockPolarity = USCI_B_SPI_CLOCKPOLARITY_INACTIVITY_HIGH;
+    param.clockPolarity = USCI_B_SPI_CLOCKPOLARITY_INACTIVITY_LOW;
     returnValue =  USCI_B_SPI_initMaster(USCI_B0_BASE, &param);
 
     if (STATUS_FAIL == returnValue){
