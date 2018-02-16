@@ -65,8 +65,16 @@ void main (void)
 
     __no_operation();
     sram_enable_chip_select();
+    GPIO_setOutputLowOnPin(
+        GPIO_PORT_P1,
+        GPIO_PIN1
+        );
     __no_operation();
     sram_disable_chip_select();
+    GPIO_setOutputHighOnPin(
+        GPIO_PORT_P1,
+        GPIO_PIN1
+        );
     __no_operation();
 
 

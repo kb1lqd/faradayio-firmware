@@ -13,48 +13,47 @@ unsigned char init_gpio_spi(void){
      * SCLK = P1.4
      * MISO = P1.2 (Needs pullup?)
      * MOSI = P1.3 (Needs pullup?)
-     * CS   = P5.5
+     * CS0  = P5.5
+     * CS1  = P3.5
+     * CS2  = P1.1
      * HOLD = P5.6
      */
-
-//    //Set initial GPIO output values (Needed with ISCI B operation?)
-//    // SCLK
-//    GPIO_setOutputHighOnPin(
-//        GPIO_PORT_P1,
-//        GPIO_PIN4
-//        );
-//
-//    // MOSI
-//    GPIO_setOutputHighOnPin(
-//        GPIO_PORT_P1,
-//        GPIO_PIN3
-//        );
-
-    // CS
-    //PA.x output
+    // Set chip select pins as outputs
     GPIO_setAsOutputPin(
-        GPIO_PORT_P5, GPIO_PIN5
+        GPIO_PORT_P5,
+        GPIO_PIN5
         );
+    GPIO_setAsOutputPin(
+        GPIO_PORT_P3,
+        GPIO_PIN5
+        );
+    GPIO_setAsOutputPin(
+        GPIO_PORT_P1,
+        GPIO_PIN1
+        );
+
+    // Set chip select pins HIGH
     GPIO_setOutputHighOnPin(
         GPIO_PORT_P5,
         GPIO_PIN5
         );
+    GPIO_setOutputHighOnPin(
+        GPIO_PORT_P3,
+        GPIO_PIN5
+        );
+    GPIO_setOutputHighOnPin(
+        GPIO_PORT_P1,
+        GPIO_PIN1
+        );
 
-//    // SCLK
-//    GPIO_setOutputHighOnPin(
-//        GPIO_PORT_P5,
-//        GPIO_PIN6
-//        );
 
-
-    //option select input
-
+    //option select MISO
     GPIO_setAsPeripheralModuleFunctionInputPin(
         GPIO_PORT_P1,
         GPIO_PIN2
         );
 
-    //option select
+    //option SCLK, MOSI
     GPIO_setAsPeripheralModuleFunctionOutputPin(
         GPIO_PORT_P1,
         GPIO_PIN3 + GPIO_PIN4
