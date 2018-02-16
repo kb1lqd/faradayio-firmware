@@ -68,12 +68,66 @@ unsigned char sram_Read_Settings(void){
     return test2;
 }
 
+unsigned char Faraday_SRAM_Write_Settings(unsigned char mode){
+    // 0 = Byte Mode
+    // 1 = Sequential Mode
+    // 2 = Page Mode
+    // 4 = Reserved (Test?)
+
+    if (mode < 4){
+        unsigned char mode2 = mode<<6; //Shift mode bits to bits 6 and 7
+        //Select the SRAM chip select
+
+        sram_enable_chip_select();
+        __delay_cycles(50); //Per datasheet at 3.0V CS delay is 25ns = @16MHz is 2.5 clock cycles
+
+        //Send the READ command
+        spi_transmit_byte(SRAM_WRSR);
+        __delay_cycles(50);
+
+        //Send dummy byte to shift SPI registers out of SRAM into RX CC430
+        spi_transmit_byte(mode2); //dummy
+
+        __delay_cycles(50); //Per datasheet at 3.0V CS delay is 25ns = @16MHz is 2.5 clock cycles
+        sram_disable_chip_select();
+    }
+    else{
+        __no_operation(); // ERROR!
+    }
+}
+
 
 unsigned char sram_selftest(void){
     volatile unsigned char testbyte;
+
+    // Mode 0
+    __no_operation();
+    Faraday_SRAM_Write_Settings(0);
     __no_operation();
     testbyte = sram_Read_Settings();
     __no_operation();
+
+    // Mode 1
+    __no_operation();
+    Faraday_SRAM_Write_Settings(1);
+    __no_operation();
+    testbyte = sram_Read_Settings();
+    __no_operation();
+
+    // Mode 2
+    __no_operation();
+    Faraday_SRAM_Write_Settings(2);
+    __no_operation();
+    testbyte = sram_Read_Settings();
+    __no_operation();
+
+    // Mode 3
+    __no_operation();
+    Faraday_SRAM_Write_Settings(3);
+    __no_operation();
+    testbyte = sram_Read_Settings();
+    __no_operation();
+
 
     // Return
     return 0;

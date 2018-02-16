@@ -24,6 +24,7 @@ unsigned char sram_enable_chip_select(void);
 unsigned char sram_disable_chip_select(void);
 unsigned char sram_Toggle_CS(void);
 unsigned char sram_Read_Settings(void);
+unsigned char Faraday_SRAM_Write_Settings(unsigned char mode);
 unsigned char sram_selftest(void);
 
 
