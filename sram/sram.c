@@ -7,7 +7,7 @@
 
 #include "driverlib.h"
 #include "sram.h"
-
+#include "spi.h"
 
 
 
@@ -53,11 +53,11 @@ unsigned char sram_Read_Settings(void){
     __delay_cycles(SPI_BYTE_CYCLES*5);
 
     //Send the READ command
-    //spi_tx(SRAM_RDSR);
+    spi_transmit_byte(SRAM_RDSR);
     __delay_cycles(SPI_BYTE_CYCLES*5);
 
     //Send dummy byte to shift SPI registers out of SRAM into RX CC430
-    spi_tx(0x00); //dummy
+    spi_transmit_byte(0x00); //dummy
     __delay_cycles(SPI_BYTE_CYCLES*5);
 
     __delay_cycles(SPI_BYTE_CYCLES*5); //Per datasheet at 3.0V CS delay is 25ns = @16MHz is 2.5 clock cycles
@@ -66,4 +66,15 @@ unsigned char sram_Read_Settings(void){
     unsigned char test2;
     test2 = UCB0RXBUF>>6; // Shift mode bytes down from bits 6 & 7 to LSB
     return test2;
+}
+
+
+unsigned char sram_selftest(void){
+    volatile unsigned char testbyte;
+    __no_operation();
+    testbyte = sram_Read_Settings();
+    __no_operation();
+
+    // Return
+    return 0;
 }

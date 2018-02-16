@@ -66,6 +66,9 @@ void main (void)
     // Toggle CS pin on SRAM IC to avoid low impedance MISO pin
     sram_Toggle_CS();
 
+    // Self Test Functions
+    sram_selftest();
+
     // Enable global interrupt
     __bis_SR_register(GIE);
 
