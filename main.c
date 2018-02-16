@@ -63,20 +63,8 @@ void main (void)
     init_gpio_spi();
     init_spi();
 
-    __no_operation();
-    sram_enable_chip_select();
-    GPIO_setOutputLowOnPin(
-        GPIO_PORT_P1,
-        GPIO_PIN1
-        );
-    __no_operation();
-    sram_disable_chip_select();
-    GPIO_setOutputHighOnPin(
-        GPIO_PORT_P1,
-        GPIO_PIN1
-        );
-    __no_operation();
-
+    // Toggle CS pin on SRAM IC to avoid low impedance MISO pin
+    sram_Toggle_CS();
 
     // Enable global interrupt
     __bis_SR_register(GIE);
