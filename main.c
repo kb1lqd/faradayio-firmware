@@ -66,11 +66,11 @@ void main (void)
     // Toggle CS pin on SRAM IC to avoid low impedance MISO pin
     sram_Toggle_CS();
 
-    // Self Test Functions
-    sram_selftest();
-
     // Enable global interrupt
     __bis_SR_register(GIE);
+
+    // Self Test Functions
+    sram_selftest();
 
     // Infinite main loop
     while(1){
@@ -133,6 +133,10 @@ void USCI_B0_ISR (void)
             __delay_cycles(40);
 
 
+            break;
+        case 4:
+            // Transmit interrupt
+            __no_operation();
             break;
         default: break;
     }

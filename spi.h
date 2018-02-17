@@ -9,6 +9,7 @@
 #define SPI_H_
 
 unsigned char spi_transmit_byte();
+unsigned char spi_receive_byte(void);
 
 
 
