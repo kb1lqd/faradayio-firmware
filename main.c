@@ -71,7 +71,7 @@ void main (void)
     __bis_SR_register(GIE);
 
     //Test
-    uartselftest();
+    //uartselftest();
 
     // Infinite main loop
     while(1){
@@ -156,6 +156,10 @@ void USCI_A0_ISR (void)
         //Vector 2 - RXIFG
         case 2:
             uartreceivedData = USCI_A_UART_receiveData(USCI_A0_BASE);
+
+            //Transmit the received byte (loopback)
+            uarttransmitbyte(uartreceivedData);
+
             __no_operation();
             break;
         default: break;
