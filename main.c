@@ -71,6 +71,7 @@ void main (void)
     init_radio();
     InitTimer();
     ReceiveOn();
+    initbridgefifo();
 
 
     // Enable global interrupt
@@ -88,9 +89,11 @@ void main (void)
     while(1){
 
         //TransmitData(txdata);
-        //__delay_cycles(12000000);
+        __delay_cycles(33600);
 
         radiomainloop();
+
+        uarttorfbridgemainloop();
 
 
         __no_operation();
@@ -173,6 +176,9 @@ void USCI_A0_ISR (void)
         case 2:
             uartreceivedData = USCI_A_UART_receiveData(USCI_A0_BASE);
             __no_operation();
+
+            //Bridge UART to RF
+            bridgeUartReceiveISR(uartreceivedData);
             break;
         default: break;
     }
