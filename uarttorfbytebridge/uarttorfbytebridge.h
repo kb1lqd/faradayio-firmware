@@ -16,6 +16,6 @@
 
 void initbridgefifo(void);
 void bridgeUartReceiveISR(unsigned char rxbyte);
-
+void bridgeRfReceiveISR(unsigned char *buffer, unsigned char length);
 
 #endif /* UARTTORFBYTEBRIDGE_UARTTORFBYTEBRIDGE_H_ */

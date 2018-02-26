@@ -12,6 +12,7 @@
 #include "cc430x613x.h"
 #include "HAL/RF1A.h"
 #include "cc1190.h"
+#include "uarttorfbytebridge/uarttorfbytebridge.h"
 
 unsigned char packetReceived;
 unsigned char packetTransmit;
@@ -160,6 +161,7 @@ void pktRxHandler(void) {
           RxBuffer[rxPosition] = ReadSingleReg(RXFIFO);
           rxPosition++;
         }
+        __no_operation();
 
         if (!rxBytesLeft){
             packetReceived = 1;
@@ -168,6 +170,9 @@ void pktRxHandler(void) {
             rxPosition = 0;
             rxPacketStarted = 0;
             ReceiveOff();
+            //Place received packet into UART to RF Bridge FIFO
+            bridgeRfReceiveISR(RxBuffer, PACKET_LEN);
+            __no_operation();
 
         }
       }
