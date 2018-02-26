@@ -14,7 +14,7 @@
 /**
  * PACKET_LEN > FIFO Size
  */
-#define  PACKET_LEN         (100)
+#define  PACKET_LEN         (255)
 
 /**
  * Index of appended RSSI

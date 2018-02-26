@@ -9,6 +9,7 @@
 
 #include "uarttorfbytebridge.h"
 #include "../fifo.h"
+#include "../radio.h"
 
 /** @name UART to RF Bridge FIFO Variables
 *
@@ -61,6 +62,9 @@ void uarttorfbridgemainloop(void){
         }
         //Get packet from queue
         status = get_fifo(&uarttorfbridge_state_machine, &uarttorfbridge_fifo_buffer, bufferbyte);
+
+        //Send packet over RF
+        TransmitData(bufferbyte);
     }
 
             __no_operation();
