@@ -17,7 +17,7 @@ void InitTimer(void)
   LFXT_Start(XT1DRIVE_0);
 
   TA0CCR1  = RX_TIMER_PERIOD;               // x cycles * 1/32768 = y us
+  TA0CCR2  = (32768/10);
   TA0CCTL1 = CCIE;                          // Enable interrupts
   TA0CTL   = TASSEL__ACLK + TACLR;          // ACLK source
 }
-
