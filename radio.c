@@ -172,6 +172,9 @@ void pktRxHandler(void) {
             ReceiveOff();
             //Place received packet into UART to RF Bridge FIFO
             bridgeRfReceiveISR(RxBuffer, PACKET_LEN);
+            if(!checkRxTimerEnabled()){
+                enableRxTimer();
+            }
             __no_operation();
 
         }

@@ -6,7 +6,7 @@
  */
 
 
-
+#include "driverlib.h"
 #include "uarttorfbytebridge.h"
 #include "../fifo.h"
 #include "../radio.h"
@@ -25,6 +25,9 @@ volatile unsigned char uarttorfbridge_rx_fifo_buffer[TRANSMIT_BUFFER_SIZE]; /**<
 
 volatile unsigned char uartrxbuffer[255];
 volatile unsigned char bufferbyte;
+
+unsigned char rxtimerenabled;
+unsigned char rxtimercnt;
 
 void initbridgefifo(void){
     //Application FIFO
@@ -87,5 +90,41 @@ void uarttorfbridgemainloop(void){
         TransmitData(bufferbyte);
     }
 
-            __no_operation();
+    __no_operation();
+
+    //Check rx timer count
+    if(checkRxTimerCount()>30){
+        __no_operation();
+    }
+}
+
+void enableRxTimer(void){
+    rxtimerenabled = 1;
+    rxtimercnt = 0;
+
+    TA0CCR2   = (32768/10);              // x cycles * 1/32768 = y us
+    TA0CCTL2 |= CCIE;
+    TA0CTL   |= MC_2 + TACLR;                 // Start the timer- continuous mode
+}
+
+unsigned char checkRxTimerEnabled(void){
+    return rxtimerenabled;
+}
+
+void disableRxTimer(void){
+    TA0CCTL2 &= ~CCIE;
+    rxtimerenabled = 0;
+    rxtimercnt = 0;
+}
+
+void incrementRxTimerCount(void){
+    rxtimercnt++;
+}
+
+unsigned char checkRxTimerCount(void){
+    return rxtimercnt;
+}
+
+void resetRxTimerCount(void){
+    rxtimercnt = 0;
 }

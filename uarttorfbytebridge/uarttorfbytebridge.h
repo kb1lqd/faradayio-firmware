@@ -17,5 +17,12 @@
 void initbridgefifo(void);
 void bridgeUartReceiveISR(unsigned char rxbyte);
 void bridgeRfReceiveISR(unsigned char *buffer, unsigned char length);
+void uarttorfbridgemainloop(void);
+void enableRxTimer(void);
+unsigned char checkRxTimerEnabled(void);
+void disableRxTimer(void);
+void incrementRxTimerCount(void);
+unsigned char checkRxTimerCount(void);
+void resetRxTimerCount(void);
 
 #endif /* UARTTORFBYTEBRIDGE_UARTTORFBYTEBRIDGE_H_ */

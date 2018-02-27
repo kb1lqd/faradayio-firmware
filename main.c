@@ -84,10 +84,6 @@ void main (void)
     init_self_test_fifo();
     fifo_selftest();
 
-    TA0CCR2   = (32768/10);              // x cycles * 1/32768 = y us
-    TA0CCTL2 |= CCIE;
-    TA0CTL   |= MC_2 + TACLR;                 // Start the timer- continuous mode
-
 
     // Infinite main loop
     while(1){
@@ -237,6 +233,7 @@ __interrupt void TIMER0_A1_ISR(void)
       break;
     case 4:  // CCR2
         TA0CCR2 += (32768/10);
+        incrementRxTimerCount();
         __no_operation();
         break;
     case 6:  break;                         // Reserved not used
