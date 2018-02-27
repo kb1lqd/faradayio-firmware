@@ -14,7 +14,7 @@
 /**
  * PACKET_LEN > FIFO Size
  */
-#define  PACKET_LEN         (100)
+#define  PACKET_LEN         (253)
 
 /**
  * Index of appended RSSI
@@ -44,7 +44,8 @@
 /**
  * Timer ISR period setting during transmit
  */
-#define  TX_TIMER_PERIOD    (40)
+//#define  TX_TIMER_PERIOD    (40)
+#define  TX_TIMER_PERIOD    (15)
 
 /**
  * Radio core transmit state bitmask
@@ -85,6 +86,10 @@
  * minimum value function
  */
 #define MIN(n,m) (((n) < (m)) ? (n) : (m))
+
+extern unsigned char transmitting;
+extern unsigned char receiving;
+extern unsigned char *TxBufferPtr;
 
 /**
  * This function enables the CC430 radio module into active receive mode.
@@ -172,5 +177,7 @@ void radioisr(void);
  * @date 2/25/2018
  */
 void radiomainloop(void);
+
+void radioPacketReceived(void);
 
 #endif /* RADIO_H_ */

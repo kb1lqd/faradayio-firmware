@@ -16,12 +16,13 @@
 unsigned char packetReceived;
 unsigned char packetTransmit;
 
-unsigned char txBytesLeft = PACKET_LEN;           // +1 for length byte
-unsigned char txPosition = 0;
-unsigned char rxBytesLeft = PACKET_LEN+2;         // +2 for status bytes
-unsigned char rxPosition = 0;
-unsigned char lengthByteRead = 0;
-unsigned char rxPacketStarted = 0;
+volatile unsigned char txBytesLeft = PACKET_LEN;           // +1 for length byte
+volatile unsigned char txPosition = 0;
+volatile unsigned char rxBytesLeft = PACKET_LEN+2;         // +2 for status bytes
+volatile unsigned char rxPosition = 0;
+volatile unsigned char lengthByteRead = 0;
+volatile unsigned char rxPacketStarted = 0;
+volatile unsigned char txFifoInWaiting;
 
 unsigned char RxBufferLength = 0;
 unsigned char TxBufferLength = 0;
@@ -34,6 +35,9 @@ unsigned char transmitting = 0;
 unsigned char receiving = 0;
 
 unsigned char RxBuffer[PACKET_LEN+2] = {0};
+//unsigned char TxBuffer[PACKET_LEN];
+unsigned char *TxBufferPtr;
+/*
 unsigned char TxBuffer[PACKET_LEN]= {
     0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09,
     0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19,
@@ -46,6 +50,7 @@ unsigned char TxBuffer[PACKET_LEN]= {
     0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88, 0x89,
     0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97, 0x98, 0x99,
 };
+*/
 
 volatile unsigned char test2;
 
@@ -105,7 +110,7 @@ void TransmitPacket(void)
   RfHighGainModeEnable();
   RfPowerAmplifierEnable();
 
-  //Tranmit routine
+  //Transmit routine
   txBytesLeft = PACKET_LEN;
   txPosition = 0;
   packetTransmit = 0;
@@ -161,14 +166,10 @@ void pktRxHandler(void) {
           rxPosition++;
         }
 
+        //End of packet, packet received
         if (!rxBytesLeft){
-            packetReceived = 1;
-            receiving = 0;
-            lengthByteRead = 0;
-            rxPosition = 0;
-            rxPacketStarted = 0;
+            radioPacketReceived();
             ReceiveOff();
-
         }
       }
       break;
@@ -203,20 +204,32 @@ void pktTxHandler(void) {
     // Which state?
     TxStatus = Strobe(RF_SNOP);
 
+    if(txPosition == 253){
+        __no_operation();
+    }
+
     switch (TxStatus & CC430_STATE_MASK) {
         case CC430_STATE_TX:
             // If there's anything to transfer..
-            if (freeSpaceInFifo = MIN(txBytesLeft, TxStatus & CC430_FIFO_BYTES_AVAILABLE_MASK))
+            txFifoInWaiting = TxStatus & CC430_FIFO_BYTES_AVAILABLE_MASK;
+            if(txFifoInWaiting > 45){
+                __no_operation();
+            }
+            if(txFifoInWaiting == 64){
+                __no_operation();
+            }
+            if (freeSpaceInFifo = MIN(txBytesLeft, txFifoInWaiting))
             {
               txBytesLeft -= freeSpaceInFifo;
               fifofillcount+=1;
 
               while(freeSpaceInFifo--)
               {
-                WriteSingleReg(TXFIFO, TxBuffer[txPosition]);
+                WriteSingleReg(TXFIFO, TxBufferPtr[txPosition]);
                 txPosition++;
               }
 
+              //End of packet, packet transmitted
               if(!txBytesLeft)
               {
                 RF1AIES |= BIT9;      // End-of-packet TX interrupt
@@ -230,11 +243,14 @@ void pktTxHandler(void) {
             }
             break;
 
-        case CC430_STATE_TX_UNDERFLOW:
-            Strobe(RF_SFTX);  // Flush the TX FIFO
-
+        case CC430_STATE_IDLE:
             __no_operation();
-            // No break here!
+            break;
+
+        case CC430_STATE_TX_UNDERFLOW:
+        Strobe(RF_SFTX);  // Flush the TX FIFO
+        __no_operation();
+        // No break here!
         default:
             if(!packetTransmit)
               packetTransmit = 1;
@@ -242,6 +258,7 @@ void pktTxHandler(void) {
             if (transmitting) {
                 if ((TxStatus & CC430_STATE_MASK) == CC430_STATE_IDLE) {
                   transmitting = 0;
+                  ReceiveOn();
                 }
             }
         break;
@@ -249,6 +266,7 @@ void pktTxHandler(void) {
 } // pktTxHandler
 
 void TransmitData(unsigned char *data){
+    TxBufferPtr = &data;
     ReceiveOff();
     receiving = 0;
     TransmitPacket();
@@ -306,3 +324,13 @@ void radiomainloop(void){
           ReceiveOn();
         }
 }
+
+void radioPacketReceived(void){
+    __no_operation();
+    packetReceived = 1;
+    receiving = 0;
+    lengthByteRead = 0;
+    rxPosition = 0;
+    rxPacketStarted = 0;
+}
+

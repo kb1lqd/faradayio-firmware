@@ -78,17 +78,30 @@ void main (void)
 
     //Test
     //uartselftest();
-    unsigned char txdata[5] = {0, 1, 2, 3, 4};
+    //unsigned char txdata[5] = {0, 1, 2, 3, 4};
 
-    init_self_test_fifo();
-    fifo_selftest();
+    //init_self_test_fifo();
+    //fifo_selftest();
 
 
     // Infinite main loop
     while(1){
 
-        //TransmitData(txdata);
-        //__delay_cycles(12000000);
+        unsigned char testdata[253];
+        unsigned char i;
+
+        for(i=0; i<253; i++){
+            testdata[i]=i;
+        }
+
+        //Trap program and wait until transmission in progress completed
+        while(transmitting){
+            __no_operation();
+        }
+        TransmitData(TxBufferPtr);
+        __delay_cycles(12000000);
+        __delay_cycles(12000000);
+        __delay_cycles(12000000);
 
         radiomainloop();
 
