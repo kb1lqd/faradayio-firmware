@@ -14,8 +14,11 @@
  */
 #define TRANSMIT_BUFFER_SIZE 256
 
+unsigned char uarttobytebridgetimeoutflag;
+
 void initbridgefifo(void);
 void bridgeUartReceiveISR(unsigned char rxbyte);
 void bridgeRfReceiveISR(unsigned char *buffer, unsigned char length);
+void uarttorfbridgemainloop(void);
 
 #endif /* UARTTORFBYTEBRIDGE_UARTTORFBYTEBRIDGE_H_ */

@@ -58,3 +58,13 @@ void StartRadioMainTimer(void){
 void StopRadioMainTimer(void){
     TA0CCTL3 &= ~CCIE;                         // Enable interrupts
 }
+
+void StartByteBridgeTimeoutTimer(void){
+    TA0CCR4   = UARTTOBYTEBRIDGETIMEOUT;              // x cycles * 1/32768 = y us
+    TA0CCTL4  |= CCIE;
+    TA0CTL    |= MC_2 + TACLR;          // ACLK source
+}
+
+void StopByteBridgeTimeoutTimer(void){
+    TA0CCTL4 &= ~CCIE;
+}

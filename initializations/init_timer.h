@@ -31,6 +31,11 @@
 #define  RADIOMAINTIMERPERIOD     (400)
 
 /**
+ * Timer period configuration setting for the UART to RF bytebridge- Sets the timeout duration to trigger transmission.
+ */
+#define  UARTTOBYTEBRIDGETIMEOUT     (3277) /** 100ms */
+
+/**
  * This Initializes the timer perhiperal as needed by the radio transmit and receive operations.
  *
  * @author Brenton Salmi, KB1LQD
@@ -101,6 +106,22 @@ void StartRadioMainTimer(void);
  * @date 3/5/2018
  */
 void StopRadioMainTimer(void);
+
+/**
+ * Starts the timer interrupt used to create the timeout counter for the UART to RF byte bridge functionality.
+ *
+ * @author Brenton Salmi, KB1LQD
+ * @date 3/5/2018
+ */
+void StartByteBridgeTimeoutTimer(void);
+
+/**
+ * Stops the timer interrupt used to create the timeout counter for the UART to RF byte bridge functionality.
+ *
+ * @author Brenton Salmi, KB1LQD
+ * @date 3/5/2018
+ */
+void StopByteBridgeTimeoutTimer(void);
 
 
 #endif /* INITIALIZATIONS_INIT_TIMER_H_ */
