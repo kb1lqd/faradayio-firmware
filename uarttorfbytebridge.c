@@ -52,6 +52,12 @@ void initbridgefifo(void){
 void bridgeUartReceiveISR(unsigned char rxbyte){
     unsigned char status;
     status = put_fifo(&uarttorfbridge_state_machine, &uarttorfbridge_fifo_buffer, &rxbyte);
+    if(!uarttobytebridgetimeoutflag){
+        StartByteBridgeTimeoutTimer();
+    }
+    else{
+        //__no_operation();
+    }
 }
 
 void bridgeRfReceiveISR(unsigned char *buffer, unsigned char length){
@@ -64,7 +70,7 @@ void bridgeRfReceiveISR(unsigned char *buffer, unsigned char length){
 }
 
 void uarttorfbridgemainloop(void){
-    if(uarttorfbridge_state_machine.inwaiting>=253){
+    if((uarttorfbridge_state_machine.inwaiting>=253) | uarttobytebridgetimeoutflag ){
         unsigned char status;
         unsigned i;
         unsigned char buffer[253];
@@ -91,6 +97,15 @@ void uarttorfbridgemainloop(void){
 
         //Send packet over RF
         //TransmitData(bufferbyte, 1 );
+
+        if(uarttorfbridge_state_machine.inwaiting){
+            uarttobytebridgetimeoutflag= 0;
+            StartByteBridgeTimeoutTimer();
+        }
+        else{
+            StopByteBridgeTimeoutTimer();
+            uarttobytebridgetimeoutflag = 0;
+        }
     }
 
             __no_operation();

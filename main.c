@@ -74,7 +74,7 @@ void main (void)
     initbridgefifo();
     //StartTestTimer();
     StartRadioMainTimer();
-    StartByteBridgeTimeoutTimer();
+    //StartByteBridgeTimeoutTimer();
     ReceiveOn();
 
 
