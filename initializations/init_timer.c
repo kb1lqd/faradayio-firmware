@@ -63,8 +63,22 @@ void StartByteBridgeTimeoutTimer(void){
     TA0CCR4   = UARTTOBYTEBRIDGETIMEOUT;              // x cycles * 1/32768 = y us
     TA0CCTL4  |= CCIE;
     TA0CTL    |= MC_2 + TACLR;          // ACLK source
+    // @TODO I should implement clearing the CCIFG of ALL timers when enabling. That probably explains a lot of wierd operation.
+    TA0CCTL4 &= ~ CCIFG; // Interrupt flag HIGH when interrupt enabled, clear CCIFG
 }
 
 void StopByteBridgeTimeoutTimer(void){
     TA0CCTL4 &= ~CCIE;
+}
+
+void StartByteBridgeTimeoutTimer2(void){
+    TA0CCR3   = UARTTOBYTEBRIDGETIMEOUT;              // x cycles * 1/32768 = y us
+    TA0CCTL3  |= CCIE;
+    TA0CTL    |= MC_2 + TACLR;          // ACLK source
+    // @TODO I should implement clearing the CCIFG of ALL timers when enabling. That probably explains a lot of wierd operation.
+    TA0CCTL3 &= ~ CCIFG; // Interrupt flag HIGH when interrupt enabled, clear CCIFG
+}
+
+void StopByteBridgeTimeoutTimer2(void){
+    TA0CCTL3 &= ~CCIE;
 }

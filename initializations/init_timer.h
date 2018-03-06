@@ -123,5 +123,9 @@ void StartByteBridgeTimeoutTimer(void);
  */
 void StopByteBridgeTimeoutTimer(void);
 
+void StartByteBridgeTimeoutTimer2(void);
+
+void StopByteBridgeTimeoutTimer2(void);
+
 
 #endif /* INITIALIZATIONS_INIT_TIMER_H_ */

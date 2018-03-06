@@ -24,6 +24,7 @@ volatile unsigned char uarttorfbridge_rx_fifo_buffer[TRANSMIT_BUFFER_SIZE]; /**<
 /** @}*/
 
 volatile unsigned char uartrxbuffer[253];
+volatile unsigned char rfrxbuffer[253];
 volatile unsigned char bufferbyte;
 
 
@@ -65,21 +66,28 @@ void bridgeRfReceiveISR(unsigned char *buffer, unsigned char length){
     unsigned char i;
     for(i=0; i<length; i++){
         status = put_fifo(&uarttorfbridge_rx_state_machine, &uarttorfbridge_rx_fifo_buffer, &buffer[i]);
+        if(!uarttobytebridgetimeoutflag){
+            StartByteBridgeTimeoutTimer();
+        }
+        else{
+            //__no_operation();
+        }
     }
     __no_operation();
 }
 
 void uarttorfbridgemainloop(void){
+    //UART to RF Main Loop
     if((uarttorfbridge_state_machine.inwaiting>=253) | uarttobytebridgetimeoutflag ){
         unsigned char status;
         unsigned i;
-        unsigned char buffer[253];
+
 
         //If larger than 253 bytes to then fragment
         if(uarttorfbridge_state_machine.inwaiting>253){
             __no_operation();
             for(i=0; i<253; i++){
-                get_fifo(&uarttorfbridge_state_machine, &uarttorfbridge_fifo_buffer, &buffer[i]);
+                get_fifo(&uarttorfbridge_state_machine, &uarttorfbridge_fifo_buffer, &uartrxbuffer[i]);
                 __no_operation();
             }
             __no_operation();
@@ -89,14 +97,14 @@ void uarttorfbridgemainloop(void){
             unsigned char bytestoreceive;
             bytestoreceive = uarttorfbridge_state_machine.inwaiting;
             for(i=0; i<bytestoreceive; i++){
-                get_fifo(&uarttorfbridge_state_machine, &uarttorfbridge_fifo_buffer, &buffer[i]);
+                get_fifo(&uarttorfbridge_state_machine, &uarttorfbridge_fifo_buffer, &uartrxbuffer[i]);
                     __no_operation();
             }
             __no_operation();
         }
 
         //Send packet over RF
-        //TransmitData(bufferbyte, 1 );
+        TransmitData(uartrxbuffer, 253 ); // I am worried that multiple packets from UART fast will overwrite the global buffer?
 
         if(uarttorfbridge_state_machine.inwaiting){
             uarttobytebridgetimeoutflag= 0;
@@ -107,6 +115,48 @@ void uarttorfbridgemainloop(void){
             uarttobytebridgetimeoutflag = 0;
         }
     }
+
+    //RF to UART Main Loop
+        if((uarttorfbridge_rx_state_machine.inwaiting>=253) | uarttobytebridgetimeoutflag ){
+            unsigned char status;
+            unsigned i;
+
+
+            //If larger than 253 bytes to then fragment
+            if(uarttorfbridge_rx_state_machine.inwaiting>253){
+                __no_operation();
+                for(i=0; i<253; i++){
+                    get_fifo(&uarttorfbridge_rx_state_machine, &uarttorfbridge_rx_fifo_buffer, &rfrxbuffer[i]);
+                    __no_operation();
+                }
+                __no_operation();
+            }
+            //Smaller than 253 bytes, grab all bytes for RF transmission
+            else{
+                unsigned char bytestoreceive;
+                bytestoreceive = uarttorfbridge_rx_state_machine.inwaiting;
+                for(i=0; i<bytestoreceive; i++){
+                    get_fifo(&uarttorfbridge_rx_state_machine, &uarttorfbridge_rx_fifo_buffer, &rfrxbuffer[i]);
+                        __no_operation();
+                }
+                __no_operation();
+            }
+
+            //Send packet over RF
+            //TransmitData(rfrxbuffer, 253 ); // I am worried that multiple packets from UART fast will overwrite the global buffer?
+
+            for(i=0; i<253; i++){
+                uarttransmitbyte(rfrxbuffer[i]);
+            }
+            if(uarttorfbridge_state_machine.inwaiting){
+                uarttobytebridgetimeoutflag= 0;
+                StartByteBridgeTimeoutTimer();
+            }
+            else{
+                StopByteBridgeTimeoutTimer();
+                uarttobytebridgetimeoutflag = 0;
+            }
+        }
 
             __no_operation();
 }
