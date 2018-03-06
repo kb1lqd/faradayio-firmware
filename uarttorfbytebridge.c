@@ -100,6 +100,11 @@ void uarttorfbridgemainloop(void){
                 get_fifo(&uarttorfbridge_state_machine, &uarttorfbridge_fifo_buffer, &uartrxbuffer[i]);
                     __no_operation();
             }
+            //(TEMP! This is not a good idea...) Clean buffer after payload
+            for(i=bytestoreceive; i<253; i++){
+                uartrxbuffer[i] = 0x00;
+                    __no_operation();
+            }
             __no_operation();
         }
 
