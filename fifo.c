@@ -15,7 +15,7 @@
 
 unsigned char put_fifo(fifo_state_machine *buffer_struct, volatile unsigned char *buffer, unsigned char *char_item){
     //Check if buffer is full!
-    if((buffer_struct->inwaiting*buffer_struct->element_size) >= buffer_struct->buffer_size){
+    if((buffer_struct->inwaiting*buffer_struct->element_size) >= (buffer_struct->buffer_size-1)){ // Must be buffer_size-1 due to 0 reference!
         //Set debut overflow bit
         buffer_struct->debug |= BIT0;
 
@@ -24,7 +24,7 @@ unsigned char put_fifo(fifo_state_machine *buffer_struct, volatile unsigned char
     }
 
     //Buffer ready to accept new item
-    else{
+    else if ((buffer_struct->inwaiting*buffer_struct->element_size) < (buffer_struct->buffer_size-1)){
         unsigned char i;
         for(i=0;i<buffer_struct->element_size;i++){
             //Insert value into the FIFO ring buffer in next avaliable location (head)
@@ -45,6 +45,9 @@ unsigned char put_fifo(fifo_state_machine *buffer_struct, volatile unsigned char
 
         return 1;
 
+    }
+    else{
+        __no_operation(); //Should never get here!
     }
 }
 

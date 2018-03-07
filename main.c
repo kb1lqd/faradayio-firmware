@@ -48,6 +48,7 @@
 #include "initializations/init_timer.h" // @TODO Make this a project global initialization directory for the linker.
 #include "uart.h"
 #include "radio.h"
+#include "uarttorfbytebridge.h"
 
 /**
  * This function is the main function of the program. It contains an infinite
@@ -70,8 +71,10 @@ void main (void)
     init_uart();
     init_radio();
     InitTimer();
+    initbridgefifo();
     //StartTestTimer();
     StartRadioMainTimer();
+    //StartByteBridgeTimeoutTimer();
     ReceiveOn();
 
 
@@ -108,6 +111,8 @@ void main (void)
         radiomainloop();
 
         radiotestdatamainloop();
+
+        uarttorfbridgemainloop();
 
 
         __no_operation();
@@ -190,6 +195,9 @@ void USCI_A0_ISR (void)
         case 2:
             uartreceivedData = USCI_A_UART_receiveData(USCI_A0_BASE);
             __no_operation();
+
+            //Bridge UART to RF
+            bridgeUartReceiveISR(uartreceivedData);
             break;
         default: break;
     }
@@ -249,7 +257,12 @@ __interrupt void TIMER0_A1_ISR(void)
     case 6:
         __no_operation();
         break;                         // Reserved not used
-    case 8:  break;                         // Reserved not used
+    case 8:  //CCR4
+        //TA0CCR4   += UARTTOBYTEBRIDGETIMEOUT;
+        StopByteBridgeTimeoutTimer();
+        uarttobytebridgetimeoutflag = 1;
+        __no_operation();
+        break;                         // Reserved not used
     case 10: break;                         // Reserved not used
     case 12: break;                         // Reserved not used
     case 14: break;                         // Overflow not used

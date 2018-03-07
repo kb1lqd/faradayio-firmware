@@ -14,6 +14,7 @@
 #include "cc1190.h"
 #include "initializations/init_rf.h"
 #include "initializations/init_timer.h"
+#include "uarttorfbytebridge.h"
 
 /** @name Radio Variables
 *
@@ -329,6 +330,7 @@ void radiotimerisr(void){
 
       if(packetReceivedFlag){
           __no_operation();
+          bridgeRfReceiveISR(RxBuffer, PACKET_LEN);
           packetReceivedFlag = 0;
       }
     }
