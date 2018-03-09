@@ -14,6 +14,11 @@
  */
 #define TRANSMIT_BUFFER_SIZE 256
 
+/**
+ * FIFO Size for improved IP packet passthrough
+ */
+#define FIFO_MIN_MTU (1400)
+
 unsigned char uarttobytebridgetimeoutflag;
 
 void initbridgefifo(void);

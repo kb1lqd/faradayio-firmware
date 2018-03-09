@@ -18,9 +18,9 @@
 *
 @{**/
 volatile fifo_state_machine uarttorfbridge_state_machine; /**< Structure for the self-test FIFO state machine */
-volatile unsigned char uarttorfbridge_fifo_buffer[TRANSMIT_BUFFER_SIZE]; /**< Self-Test FIFO buffer */
+volatile unsigned char uarttorfbridge_fifo_buffer[FIFO_MIN_MTU]; /**< Self-Test FIFO buffer */
 volatile fifo_state_machine uarttorfbridge_rx_state_machine; /**< Structure for the self-test FIFO state machine */
-volatile unsigned char uarttorfbridge_rx_fifo_buffer[TRANSMIT_BUFFER_SIZE]; /**< Self-Test FIFO buffer */
+volatile unsigned char uarttorfbridge_rx_fifo_buffer[FIFO_MIN_MTU]; /**< Self-Test FIFO buffer */
 /** @}*/
 
 volatile unsigned char uartrxbuffer[253];
@@ -38,7 +38,7 @@ void initbridgefifo(void){
     //rf_datalink_tx_fifo_state_machine.length = 0;
     uarttorfbridge_state_machine.max_inwait = 0;
     uarttorfbridge_state_machine.tail = 0;
-    uarttorfbridge_state_machine.buffer_size = TRANSMIT_BUFFER_SIZE;
+    uarttorfbridge_state_machine.buffer_size = FIFO_MIN_MTU;
 
     uarttorfbridge_rx_state_machine.debug = 0;
     uarttorfbridge_rx_state_machine.element_size = 1;
@@ -47,7 +47,7 @@ void initbridgefifo(void){
     //rf_datalink_tx_fifo_state_machine.length = 0;
     uarttorfbridge_rx_state_machine.max_inwait = 0;
     uarttorfbridge_rx_state_machine.tail = 0;
-    uarttorfbridge_rx_state_machine.buffer_size = TRANSMIT_BUFFER_SIZE;
+    uarttorfbridge_rx_state_machine.buffer_size = FIFO_MIN_MTU;
 }
 
 void bridgeUartReceiveISR(unsigned char rxbyte){
