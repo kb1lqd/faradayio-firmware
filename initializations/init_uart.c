@@ -23,9 +23,9 @@ uint8_t uartreceivedData = 0x00;
 unsigned char init_uart(void){
     USCI_A_UART_initParam param = {0};
     param.selectClockSource = USCI_A_UART_CLOCKSOURCE_SMCLK;
-    param.clockPrescalar = 104;
+    param.clockPrescalar = 1250;
     param.firstModReg = 0;
-    param.secondModReg = 0;
+    param.secondModReg = 1;
     param.parity = USCI_A_UART_NO_PARITY;
     param.msborLsbFirst = USCI_A_UART_LSB_FIRST;
     param.numberofStopBits = USCI_A_UART_ONE_STOP_BIT;

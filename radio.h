@@ -11,6 +11,7 @@
 #ifndef RADIO_H_
 #define RADIO_H_
 
+
 /**
  * PACKET_LEN > FIFO Size
  */
@@ -223,5 +224,7 @@ void RadioTestTimerIsr(void);
  * @date 3/4/2018
  */
 void FlushReceiveFifo(void);
+
+unsigned char checkiftx(void);
 
 #endif /* RADIO_H_ */

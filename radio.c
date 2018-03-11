@@ -98,22 +98,28 @@ void ReceivePacket(void)
 
 void TransmitPacket(unsigned char len)
 {
-    //Reset logic variables
-    txBytesLeft = len;
-    txPosition = 0;
-    packetTransmitFlag = 0;
-    transmittingFlag = 1;
+    if(transmittingFlag){
+        __no_operation();//Should never get here!
+    }
+    else{
 
-    //Setup CC1190
-    RfLowNoiseAmplifierDisable();
-    RfHighGainModeEnable();
-    RfPowerAmplifierEnable();
+        //Reset logic variables
+        txBytesLeft = len;
+        txPosition = 0;
+        packetTransmitFlag = 0;
+        transmittingFlag = 1;
 
-    //Set radio module into transmit mode
-    Strobe( RF_STX );                         // Strobe STX
+        //Setup CC1190
+        RfLowNoiseAmplifierDisable();
+        RfHighGainModeEnable();
+        RfPowerAmplifierEnable();
 
-    //Start the transmit packet timer
-    StartRadioTxTimer();
+        //Set radio module into transmit mode
+        Strobe( RF_STX );                         // Strobe STX
+
+        //Start the transmit packet timer
+        StartRadioTxTimer();
+    }
 
 }
 
@@ -249,6 +255,9 @@ void pktTxHandler(void) {
     TxStatus = Strobe(RF_SNOP);
 
     switch (TxStatus & CC430_STATE_MASK) {
+        case CC430_STATE_IDLE:
+            __no_operation();
+            break;
         case CC430_STATE_TX:
             //Save into variable the current packet bytes left or current FIFO size, whichever is smaller.
             if (freeSpaceInFifo = MIN(txBytesLeft, TxStatus & CC430_FIFO_BYTES_AVAILABLE_MASK))
@@ -343,6 +352,7 @@ void radiotimerisr(void){
 
       if(packetTransmitFlag)
           __no_operation();
+          packetTransmitFlag=0;
     }
 }
 
@@ -350,9 +360,14 @@ void radioisr(void){
     // If RX sync word received
     if(!(RF1AIES & BIT9))
         {
-        //New packet is arriving, start flag to initiate receiver logic to receive packet
-        incomingpacketflag = 1;
-          __no_operation();
+        if(!rxPacketStartedFlag){
+            __no_operation();
+
+            //New packet is arriving, start flag to initiate receiver logic to receive packet
+            incomingpacketflag = 1;
+
+              __no_operation();
+        }
         }
         else while(1);                // trap, this is an error state @TODO Is this needed???
 
@@ -422,4 +437,8 @@ void RadioTestTimerIsr(void){
 void FlushReceiveFifo(void){
     Strobe(RF_SIDLE);
     Strobe(RF_SFRX);
+}
+
+unsigned char checkiftx(void){
+    return transmittingFlag;
 }

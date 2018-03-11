@@ -33,7 +33,8 @@
 /**
  * Timer period configuration setting for the UART to RF bytebridge- Sets the timeout duration to trigger transmission.
  */
-#define  UARTTOBYTEBRIDGETIMEOUT     (3277) /** 100ms */
+//#define  UARTTOBYTEBRIDGETIMEOUT     (3277) /** 100ms */
+#define  UARTTOBYTEBRIDGETIMEOUT     (16384) /** 500ms */
 
 /**
  * This Initializes the timer perhiperal as needed by the radio transmit and receive operations.

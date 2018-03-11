@@ -78,51 +78,53 @@ void bridgeRfReceiveISR(unsigned char *buffer, unsigned char length){
 
 void uarttorfbridgemainloop(void){
     //UART to RF Main Loop
-    if((uarttorfbridge_state_machine.inwaiting>=253) | uarttobytebridgetimeoutflag ){
-        unsigned char status;
-        unsigned i;
+    if(!checkiftx()){
+        if((uarttorfbridge_state_machine.inwaiting>=253) | uarttobytebridgetimeoutflag ){
+            unsigned char status;
+            unsigned i;
 
 
-        //If larger than 253 bytes to then fragment
-        if(uarttorfbridge_state_machine.inwaiting>253){
-            __no_operation();
-            for(i=0; i<253; i++){
-                get_fifo(&uarttorfbridge_state_machine, &uarttorfbridge_fifo_buffer, &uartrxbuffer[i]);
+            //If larger than 253 bytes to then fragment
+            if(uarttorfbridge_state_machine.inwaiting>253){
+                __no_operation();
+                for(i=0; i<253; i++){
+                    get_fifo(&uarttorfbridge_state_machine, &uarttorfbridge_fifo_buffer, &uartrxbuffer[i]);
+                    __no_operation();
+                }
                 __no_operation();
             }
-            __no_operation();
-        }
-        //Smaller than 253 bytes, grab all bytes for RF transmission
-        else{
-            unsigned char bytestoreceive;
-            bytestoreceive = uarttorfbridge_state_machine.inwaiting;
-            for(i=0; i<bytestoreceive; i++){
-                get_fifo(&uarttorfbridge_state_machine, &uarttorfbridge_fifo_buffer, &uartrxbuffer[i]);
-                    __no_operation();
+            //Smaller than 253 bytes, grab all bytes for RF transmission
+            else{
+                unsigned char bytestoreceive;
+                bytestoreceive = uarttorfbridge_state_machine.inwaiting;
+                for(i=0; i<bytestoreceive; i++){
+                    get_fifo(&uarttorfbridge_state_machine, &uarttorfbridge_fifo_buffer, &uartrxbuffer[i]);
+                        __no_operation();
+                }
+                //(TEMP! This is not a good idea...) Clean buffer after payload
+                for(i=bytestoreceive; i<253; i++){
+                    uartrxbuffer[i] = 0x00;
+                        __no_operation();
+                }
+                __no_operation();
             }
-            //(TEMP! This is not a good idea...) Clean buffer after payload
-            for(i=bytestoreceive; i<253; i++){
-                uartrxbuffer[i] = 0x00;
-                    __no_operation();
+
+            //Send packet over RF
+            TransmitData(uartrxbuffer, 253 ); // I am worried that multiple packets from UART fast will overwrite the global buffer?
+
+            if(uarttorfbridge_state_machine.inwaiting){
+                uarttobytebridgetimeoutflag= 0;
+                StartByteBridgeTimeoutTimer();
             }
-            __no_operation();
-        }
-
-        //Send packet over RF
-        TransmitData(uartrxbuffer, 253 ); // I am worried that multiple packets from UART fast will overwrite the global buffer?
-
-        if(uarttorfbridge_state_machine.inwaiting){
-            uarttobytebridgetimeoutflag= 0;
-            StartByteBridgeTimeoutTimer();
-        }
-        else{
-            StopByteBridgeTimeoutTimer();
-            uarttobytebridgetimeoutflag = 0;
+            else{
+                StopByteBridgeTimeoutTimer();
+                uarttobytebridgetimeoutflag = 0;
+            }
         }
     }
 
     //RF to UART Main Loop
-        if((uarttorfbridge_rx_state_machine.inwaiting>=253) | uarttobytebridgetimeoutflag ){
+        if((uarttorfbridge_rx_state_machine.inwaiting>=253) | (uarttobytebridgetimeoutflag & (uarttorfbridge_rx_state_machine.inwaiting>0)) ){
             unsigned char status;
             unsigned i;
 
