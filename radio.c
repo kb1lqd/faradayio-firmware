@@ -440,5 +440,6 @@ void FlushReceiveFifo(void){
 }
 
 unsigned char checkiftx(void){
-    return transmittingFlag;
+    //return transmittingFlag;
+    return 0;
 }

@@ -12,7 +12,7 @@
 /**
  * Transmit buffer FIFO size in bytes.
  */
-#define TRANSMIT_BUFFER_SIZE 256
+#define TRANSMIT_BUFFER_SIZE 512
 
 unsigned char uarttobytebridgetimeoutflag;
 
