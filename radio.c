@@ -15,6 +15,7 @@
 #include "initializations/init_rf.h"
 #include "initializations/init_timer.h"
 #include "uarttorfbytebridge.h"
+#include "led.h"
 
 /** @name Radio Variables
 *
@@ -102,6 +103,7 @@ void TransmitPacket(unsigned char len)
         __no_operation();//Should never get here!
     }
     else{
+        enableRedLed();
 
         //Reset logic variables
         txBytesLeft = len;
@@ -211,6 +213,8 @@ void pktRxHandler(void) {
             rxPosition = 0;
             rxPacketStartedFlag = 0;
 
+            disableGreenLed();
+
             //Turn the receiver OFF and flush  (just incase)
             ReceiveOff();
             FlushReceiveFifo();
@@ -291,6 +295,8 @@ void pktTxHandler(void) {
                 //Flush receiver FIFO (Just incase) @TODO Is this really needed? I forget why I placed this here but probably in error.
                 FlushReceiveFifo();
 
+                disableRedLed();
+
                 //Put radio module into receive mode
                 ReceiveOn();
               }
@@ -365,6 +371,7 @@ void radioisr(void){
 
             //New packet is arriving, start flag to initiate receiver logic to receive packet
             incomingpacketflag = 1;
+            enableGreenLed();
 
               __no_operation();
         }

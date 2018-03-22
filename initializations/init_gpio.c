@@ -12,6 +12,35 @@
 #include "init_gpio.h"
 #include "../cc1190.h"
 
+void init_gpio_led(void){
+
+    /*
+     * P3.6 GREEN
+     * P3.7 RED
+     */
+
+
+    GPIO_setAsOutputPin(
+        GPIO_PORT_P3,
+        GPIO_PIN6
+        );
+
+    GPIO_setAsOutputPin(
+            GPIO_PORT_P3,
+            GPIO_PIN7
+            );
+
+    GPIO_setOutputLowOnPin(
+            GPIO_PORT_P3,
+            GPIO_PIN6
+            );
+
+    GPIO_setOutputLowOnPin(
+            GPIO_PORT_P3,
+            GPIO_PIN7
+            );
+}
+
 unsigned char init_gpio_spi(void){
     /**
      * SCLK = P1.4

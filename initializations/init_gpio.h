@@ -18,6 +18,8 @@
  * @return False
  * @date 2/9/2018
  */
+
+void init_gpio_led(void);
 unsigned char init_gpio_spi(void);
 
 

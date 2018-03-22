@@ -49,6 +49,7 @@
 #include "uart.h"
 #include "radio.h"
 #include "uarttorfbytebridge.h"
+#include "led.h"
 
 /**
  * This function is the main function of the program. It contains an infinite
@@ -67,6 +68,7 @@ void main (void)
 
     //Initialize SPI
     init_gpio_spi();
+    init_gpio_led();
     init_spi();
     init_uart();
     init_radio();
@@ -82,11 +84,10 @@ void main (void)
     __bis_SR_register(GIE);
 
     //Test
-    //uartselftest();
-    //unsigned char txdata[5] = {0, 1, 2, 3, 4};
-
-    //init_self_test_fifo();
-    //fifo_selftest();
+    enableGreenLed();
+    disableGreenLed();
+    enableRedLed();
+    disableRedLed();
 
     changeRfPacketLength(50);
     changeRfPacketLength(253);
